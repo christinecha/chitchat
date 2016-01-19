@@ -11,15 +11,18 @@ let io = require('socket.io')(http)
 // io.use(p2p)
 
 app.use(express.static(__dirname + '/public'));
+
 app.get('/', function(req, res) {
   res.sendFile(__dirname + '/index.html')
 })
 
 io.on('connection', function(socket) {
-  let author = 'anonymous'
-  let message = ''
+  io.emit('user connected', ' user has connected at ' + socket.id)
 
-  io.emit('user connected', (author + ' has connected at ' + socket.id))
+  socket.on('user is typing', function(msgData){
+    // console.log(msgData)
+    io.emit('user is typing', msgData)
+  })
 
   socket.on('message sent', function(msgData){
     console.log(msgData)

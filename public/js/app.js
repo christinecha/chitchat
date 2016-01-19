@@ -1,25 +1,27 @@
 "use strict"
 
-var socket = io()
+import React from 'react'
+import ReactDOM from 'react-dom'
+import reducer from './reducer.js'
+import {ChatroomContainer} from './components/Chatroom.jsx'
+import {createStore} from 'redux'
+import {Provider} from 'react-redux'
+// import * as action from './actions.js'
 
-socket.on('message sent', function(msgData) {
-  let $author = $('<span>').html(msgData.author)
-  let $message = $('<span>').html(msgData.message)
-  let $messageBlock = $('<li>').append($author, ': ', $message)
-  $('#messageboard').append($messageBlock)
+const store = createStore(reducer)
+
+store.dispatch({
+  type: 'SET_INITIAL_STATE',
+  data: {
+    messages: [{message: "hi", author: "christine"}],
+    currentAuthor: '',
+    currentMessage: ''
+  }
 })
 
-socket.on('user connected', function(msg) {
-    $('#messageboard').append($('<li>').text(msg))
-})
-
-$('#messageform').submit(function(e) {
-    e.preventDefault()
-    let msgData = {
-      author: $('#author').val(),
-      message: $('#message').val()
-    }
-    socket.emit('message sent', msgData)
-    $('#message').val('')
-    return false
-})
+ReactDOM.render(
+  <Provider store={store}>
+    <ChatroomContainer />
+  </Provider>,
+  document.getElementById('chatroom-app')
+)
